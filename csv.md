@@ -1,0 +1,85 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSV Comparison Tool</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        h1 { font-size: 24px; }
+        input[type="file"] { margin: 10px 0; }
+        button { margin: 20px 0; padding: 10px 20px; }
+        #output { margin-top: 20px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 10px; border: 1px solid #ccc; }
+        th { background-color: #f4f4f4; }
+    </style>
+</head>
+<body>
+    <h1>CSV Comparison Tool</h1>
+    <p>Upload two CSV files to compare:</p>
+    <input type="file" id="csvFile1" accept=".csv">
+    <input type="file" id="csvFile2" accept=".csv"><br>
+    <button onclick="compareCSV()">Compare Files</button>
+
+    <div id="output"></div>
+    <a id="downloadLink" href="#" style="display:none;">Download Result</a>
+
+    <script>
+        function compareCSV() {
+            const file1 = document.getElementById('csvFile1').files[0];
+            const file2 = document.getElementById('csvFile2').files[0];
+
+            if (!file1 || !file2) {
+                alert('Please select two CSV files.');
+                return;
+            }
+
+            const reader1 = new FileReader();
+            const reader2 = new FileReader();
+
+            reader1.onload = function(e) {
+                const csv1 = e.target.result;
+                reader2.onload = function(e) {
+                    const csv2 = e.target.result;
+
+                    // Parse CSV files and compare them
+                    const output = compareCSVFiles(csv1, csv2);
+                    document.getElementById('output').innerHTML = output;
+
+                    // Generate downloadable output
+                    const blob = new Blob([output], { type: 'text/csv' });
+                    const url = URL.createObjectURL(blob);
+                    const link = document.getElementById('downloadLink');
+                    link.href = url;
+                    link.download = 'csv_comparison_result.csv';
+                    link.style.display = 'inline-block';
+                    link.textContent = 'Download Result';
+                };
+                reader2.readAsText(file2);
+            };
+            reader1.readAsText(file1);
+        }
+
+        function compareCSVFiles(csv1, csv2) {
+            // Simple example of comparing CSVs; expand as needed
+            const rows1 = csv1.split('\n');
+            const rows2 = csv2.split('\n');
+
+            let output = '<table><thead><tr><th>Line</th><th>File 1</th><th>File 2</th></tr></thead><tbody>';
+
+            const maxLength = Math.max(rows1.length, rows2.length);
+            for (let i = 0; i < maxLength; i++) {
+                const row1 = rows1[i] || '';
+                const row2 = rows2[i] || '';
+                output += `<tr><td>${i + 1}</td><td>${row1}</td><td>${row2}</td></tr>`;
+            }
+            output += '</tbody></table>';
+
+            return output;
+        }
+    </script>
+</body>
+</html>
+```
